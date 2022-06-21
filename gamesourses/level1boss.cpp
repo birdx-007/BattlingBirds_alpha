@@ -1,0 +1,140 @@
+#include "gameheaders/managerdep.h"
+void ManagerDep::GenerateLevel1Boss()
+{
+    auto tmp=this->enemymanager.bosses.find(63);
+    if(tmp!=this->enemymanager.bosses.end())
+    {
+        int Existcount=Count-tmp->second.tmpcount;
+        qreal maxhp=tmp->second.maxhp;
+        qreal curhp=tmp->second.hp;
+        if(curhp>5.0/6*maxhp)
+        {
+            if(Count>=tmp->second.tmpcount+100)//缓冲时间
+            {
+                this->hero->isAbsorbingProps=false;
+                if(Existcount%75==0&&Existcount%150!=0)
+                {
+                    this->enemymanager.SetOneEnemyMoveMode(&tmp->second,this->hero->collibox.center().x()-150*Width/1920,tmp->second.Y,12,-72.0/std::abs(this->hero->collibox.center().x()-150*Width/1920-tmp->second.X)*(Width/1920.0));
+                }
+                if(Existcount%150==0)
+                {
+                    for(int i=0;i<4*Difficulty-1;i++)
+                    {
+                        this->barragemanager.AddOneLine(&tmp->second,tmp->second.collibox.center().x()-75*Width/1920,tmp->second.collibox.center().y(),M_PI/2,tr("snow"),tr("bubble"),5.0,1,2.0+2*i,0.0);
+                    }
+                    for(int i=0;i<3*Difficulty+2;i++)
+                    {
+                        this->barragemanager.AddOneAim(&tmp->second,this->hero,tmp->second.collibox.center().x()-85.0*Width/1920,tmp->second.collibox.center().y(),20-2*i,11*M_PI/6+i*M_PI/80,tr("snow"),tr("ball"),5.0+i,-0.001,M_PI);
+                        this->barragemanager.AddOneAim(&tmp->second,this->hero,tmp->second.collibox.center().x()+85.0*Width/1920,tmp->second.collibox.center().y(),20-2*i,11*M_PI/6+i*M_PI/80,tr("snow"),tr("ball"),5.0+i,-0.001,M_PI);
+                    }
+                }
+                if(tmp->second.stagelefttime<=0)//超出时间限制
+                {
+                    tmp->second.setHp(5.0/6*maxhp);
+                }
+                tmp->second.stagelefttime=30.0-(Existcount-100)*0.015;
+            }
+            else
+            {
+                tmp->second.setHp(maxhp);//无敌
+                this->hero->isAbsorbingProps=true;
+            }
+        }
+        else if(curhp>0.5*maxhp)
+        {
+            if(tmp->second.stage==1)
+            {
+                tmp->second.stage=2,tmp->second.tmpcount=Count,tmp->second.stagelefttime=45,this->bulletmanager.DestoryAllEnemyBullets();
+                qreal distance=qSqrt((tmp->second.X-470.0*Width/1920)*(tmp->second.X-470.0*Width/1920)+(tmp->second.Y-200.0*Width/1920)*(tmp->second.Y-200.0*Width/1920));
+                this->enemymanager.SetOneEnemyMoveMode(&tmp->second,470.0*Width/1920,200.0*Width/1920,8.0,distance!=0.0?-64.0/(2.0*distance*1920/Width):0);
+            }
+            if(Count>=tmp->second.tmpcount+100)//缓冲时间
+            {
+                this->hero->isAbsorbingProps=false;
+                if(Existcount%100==0)
+                {
+                    this->enemymanager.SetOneEnemyRandomMode(&tmp->second,100.0*Width/1920,700.0*Width/1920,100.0*Width/1920,300.0*Width/1920,8.0);
+                }
+                if(Existcount%(8-2*Difficulty)==0)
+                {
+                    this->barragemanager.AddOneAim(&tmp->second,this->hero,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),1,0,tr("snow"),tr("ball"),6.0,0.01,(qrand()%10-4.5)*M_PI/24);
+                }
+                if(Existcount%150==0)
+                {
+                    this->barragemanager.AddOneCircle(&tmp->second,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),6*Difficulty,tr("snow"),tr("bubble"),8.0,-0.1);
+                }
+                if(tmp->second.stagelefttime<=0)//超出时间限制
+                {
+                    tmp->second.setHp(0.5*maxhp);
+                }
+                tmp->second.stagelefttime=45.0-(Existcount-100)*0.015;
+            }
+            else
+            {
+                tmp->second.setHp(5.0/6*maxhp);//无敌
+                this->hero->isAbsorbingProps=true;
+            }
+        }
+        else if(curhp>1.0/3*maxhp)
+        {
+            if(tmp->second.stage==2)
+            {
+                tmp->second.stage=3,tmp->second.tmpcount=Count,tmp->second.stagelefttime=30,this->bulletmanager.DestoryAllEnemyBullets();
+                qreal distance=qSqrt((tmp->second.X-470.0*Width/1920)*(tmp->second.X-470.0*Width/1920)+(tmp->second.Y-235.0*Width/1920)*(tmp->second.Y-235.0*Width/1920));
+                this->enemymanager.SetOneEnemyMoveMode(&tmp->second,470.0*Width/1920,235.0*Width/1920,8.0,distance!=0.0?-64.0/(2.0*distance*1920/Width):0);
+            }
+            if(Count>=tmp->second.tmpcount+100)//缓冲时间
+            {
+                this->hero->isAbsorbingProps=false;
+                if(Existcount%75==0)
+                {
+                    this->enemymanager.SetOneEnemyRandomMode(&tmp->second,100.0*Width/1920,700.0*Width/1920,100.0*Width/1920,300.0*Width/1920,8.0);
+                    this->barragemanager.AddOneAim(&tmp->second,this->hero,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),2*Difficulty,M_PI/5,tr("snow"),tr("ball"),2.0,0.01,0);
+                }
+                if(Existcount%(20-2*Difficulty)==0)
+                {
+                    this->barragemanager.AddOneCircle(&tmp->second,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),6*Difficulty,tr("snow"),tr("pellet"),8.0,0.01,Existcount/(10-Difficulty));
+                    this->barragemanager.AddOneCircle(&tmp->second,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),6*Difficulty,tr("snow"),tr("pellet"),8.0,0.01,-Existcount/(10-Difficulty));
+                }
+                if(tmp->second.stagelefttime<=0)//超出时间限制
+                {
+                    tmp->second.setHp(1.0/3*maxhp);
+                }
+                tmp->second.stagelefttime=30.0-(Existcount-100)*0.015;
+            }
+            else
+            {
+                tmp->second.setHp(0.5*maxhp);//无敌
+                this->hero->isAbsorbingProps=true;
+            }
+        }
+        else
+        {
+            if(tmp->second.stage==3)
+            {
+                tmp->second.stage=4,tmp->second.tmpcount=Count,tmp->second.stagelefttime=45,this->bulletmanager.DestoryAllEnemyBullets();
+                qreal distance=qSqrt((tmp->second.X-470.0*Width/1920)*(tmp->second.X-470.0*Width/1920)+(tmp->second.Y-235.0*Width/1920)*(tmp->second.Y-235.0*Width/1920));
+                this->enemymanager.SetOneEnemyMoveMode(&tmp->second,470.0*Width/1920,235.0*Width/1920,8.0,distance!=0.0?-64.0/(2.0*distance*1920/Width):0);
+            }
+            if(Count>=tmp->second.tmpcount+100)//缓冲时间
+            {
+                this->hero->isAbsorbingProps=false;
+                if(Existcount%10==0)
+                {
+                    this->barragemanager.AddOneRing(&tmp->second,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),-Existcount/5,100.0*Width/1920,6+Difficulty*2,tr("snow"),tr("ball"),9+Difficulty,-0.125+Difficulty*0.01,-Existcount/5,0);
+                    this->barragemanager.AddOneLine(&tmp->second,tmp->second.collibox.center().x(),tmp->second.collibox.center().y(),Existcount/5,tr("snow"),tr("pellet"),25.0*Width/1920,2*Difficulty-1,9+Difficulty,-0.125+Difficulty*0.01);
+                }
+                if(tmp->second.stagelefttime<=0)//超出时间限制
+                {
+                    tmp->second.setHp(0*maxhp);
+                }
+                tmp->second.stagelefttime=45.0-(Existcount-100)*0.015;
+            }
+            else
+            {
+                tmp->second.setHp(1.0/3*maxhp);//无敌
+                this->hero->isAbsorbingProps=true;
+            }
+        }
+    }
+}
